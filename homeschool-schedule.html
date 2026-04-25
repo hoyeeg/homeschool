@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Homeschool Weekly Schedule</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #fafafa; color: #222; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.4; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 20px; margin: 0 0 4px 0; }
+h2 { font-size: 16px; margin: 20px 0 8px 0; color: #1F3864; }
+h3 { font-size: 13px; margin: 0 0 8px 0; color: #444; font-weight: 600; }
+h4 { font-size: 12px; margin: 14px 0 6px 0; color: #1F3864; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.subtitle { color: #666; font-size: 12px; margin-bottom: 16px; }
+.tabs { display: flex; gap: 4px; border-bottom: 2px solid #e0e0e0; margin-bottom: 16px; }
+.tab { padding: 8px 14px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: #666; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+.tab.active { color: #1F3864; border-bottom-color: #1F3864; }
+.tab:hover { color: #1F3864; }
+.panel { display: none; }
+.panel.active { display: block; }
+.day-selector { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.day-selector button { padding: 6px 12px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 4px; font-size: 12px; font-weight: 500; color: #555; }
+.day-selector button:hover { border-color: #4472C4; color: #1F3864; }
+.day-selector button.active { background: #1F3864; color: white; border-color: #1F3864; }
+.day-selector button.today:not(.active) { border-color: #d62728; color: #d62728; }
+.today-hdr { background: linear-gradient(135deg, #1F3864, #4472C4); color: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; }
+.today-hdr .date { font-size: 20px; font-weight: 600; }
+.today-hdr .hint { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+.today-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .today-grid { grid-template-columns: 1fr; } }
+.kid-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+.kid-card h3 { font-size: 14px; margin: 0 0 8px 0; padding-bottom: 6px; border-bottom: 2px solid #e0e0e0; }
+.kid-card.ginny h3 { border-bottom-color: #8FAADC; }
+.kid-card.casey h3 { border-bottom-color: #A9D18E; }
+.block { padding: 6px 10px; margin: 4px 0; border-radius: 4px; display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.block .time { font-size: 11px; color: #555; min-width: 95px; font-variant-numeric: tabular-nums; }
+.block .lbl { flex: 1; }
+.block.now { outline: 2px solid #d62728; outline-offset: -2px; font-weight: 600; }
+.block.past { opacity: 0.55; }
+.block input[type=checkbox] { margin: 0; cursor: pointer; }
+.cat-school { background: #FFF2CC; }
+.cat-academy { background: #E4D9F0; }
+.cat-lunch { background: #D5E3B8; }
+.cat-recess { background: #E7E6E6; }
+.cat-activity { background: #FCE4D6; }
+.cat-morning { background: #DEEBF7; }
+.cat-church { background: #F4CCCC; }
+.cat-project { background: #FFE699; }
+.cat-draft { background: #FFF8E6; border: 1px dashed #c9a227; }
+.cat-none { background: #f5f5f5; color: #aaa; }
+.day-checklist { list-style: none; padding: 0; margin: 4px 0 0 0; font-size: 12px; }
+.day-checklist li { padding: 5px 4px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: flex-start; gap: 6px; }
+.day-checklist li:last-child { border-bottom: none; }
+.day-checklist li.done label { text-decoration: line-through; color: #aaa; }
+.day-checklist li input { margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+.day-checklist li label { cursor: pointer; flex: 1; }
+.day-checklist .subj-badge { background: #e7eef7; color: #1F3864; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; margin-right: 6px; white-space: nowrap; }
+.day-count { font-size: 11px; color: #888; font-weight: 400; }
+.assign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 640px) { .assign-grid { grid-template-columns: 1fr; } }
+.assign-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; }
+.assign-card h3 { margin-top: 0; padding-bottom: 6px; border-bottom: 2px solid #e0e0e0; font-size: 14px; }
+.assign-card.ginny h3 { border-bottom-color: #8FAADC; }
+.assign-card.casey h3 { border-bottom-color: #A9D18E; }
+.assign-card.shared h3 { border-bottom-color: #bbb; }
+.assign-card .subj { font-weight: 600; margin-top: 12px; margin-bottom: 4px; color: #1F3864; font-size: 13px; }
+.assign-card .na { font-style: italic; color: #999; font-size: 12px; margin-left: 4px; }
+.assign-card ul { margin: 0 0 6px 0; padding-left: 20px; font-size: 12px; color: #333; list-style: none; }
+.assign-card ul ul { margin-top: 2px; margin-bottom: 2px; padding-left: 18px; }
+.assign-card li { margin: 3px 0; position: relative; }
+.assign-card li.done > label { text-decoration: line-through; color: #aaa; }
+.assign-card li input { margin-right: 6px; vertical-align: middle; }
+.assign-card li label { cursor: pointer; vertical-align: middle; }
+.assign-card .group-title { font-weight: 500; color: #333; }
+.empty { color: #aaa; font-style: italic; font-size: 12px; padding: 8px; text-align: center; }
+.btn-reset { float: right; background: transparent; border: 1px solid #ccc; padding: 4px 10px; border-radius: 4px; font-size: 11px; color: #666; cursor: pointer; }
+.btn-reset:hover { background: #f0f0f0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Homeschool Weekly Schedule</h1>
+  <div class="subtitle">Ginny (grade 7) and Casey (grade 4). Week starts Wed. Tue Airdrie Christian Academy. Wed/Thu home school. Fri draft. Sat/Sun free. Mon free. History is bedtime reading.</div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="today">Day view</button>
+    <button class="tab" data-tab="assignments">Assignments</button>
+  </div>
+
+  <div class="panel active" id="panel-today">
+    <div class="day-selector" id="day-selector"></div>
+    <div class="today-hdr">
+      <div class="date" id="today-date">Today</div>
+      <div class="hint" id="today-hint"></div>
+    </div>
+    <div class="today-grid">
+      <div class="kid-card ginny">
+        <h3>Ginny <button class="btn-reset" data-reset="ginny">Reset day</button></h3>
+        <h4>Schedule</h4>
+        <div id="today-ginny"></div>
+        <h4>Today's work <span id="ginny-count" class="day-count"></span></h4>
+        <div id="today-ginny-checklist"></div>
+      </div>
+      <div class="kid-card casey">
+        <h3>Casey <button class="btn-reset" data-reset="casey">Reset day</button></h3>
+        <h4>Schedule</h4>
+        <div id="today-casey"></div>
+        <h4>Today's work <span id="casey-count" class="day-count"></span></h4>
+        <div id="today-casey-checklist"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-assignments">
+    <div class="assign-grid">
+      <div class="assign-card ginny" id="assign-ginny"></div>
+      <div class="assign-card casey" id="assign-casey"></div>
+    </div>
+    <div class="assign-card shared" id="assign-shared" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const WEEK_ORDER = ['Wednesday','Thursday','Friday','Saturday','Sunday','Monday','Tuesday'];
+const WEEK_ORDER_SHORT = ['Wed','Thu','Fri','Sat','Sun','Mon','Tue'];
+const WEEK_START_JS_DAY = 3;
+
+function cat(txt) {
+  if (!txt) return 'none';
+  const t = txt.toLowerCase();
+  if (t.includes('church')) return 'church';
+  if (t.includes('academy')) return 'academy';
+  if (t.includes('lunch')) return 'lunch';
+  if (t.includes('recess')) return 'recess';
+  if (t.includes('(draft)')) return 'draft';
+  if (t.includes('year-end project')) return 'project';
+  if (['wake','breakfast','morning'].some(x=>t.includes(x))) return 'morning';
+  if (['bjj','badminton','swim','lesson','drums practice','piano practice','piano (free play)'].some(x=>t.includes(x))) return 'activity';
+  return 'school';
+}
+
+const BLOCKS = [];
+function add(day, kid, sh, sm, eh, em, label) {
+  if (kid === 'b') { BLOCKS.push({day,kid:'g',sh,sm,eh,em,label}); BLOCKS.push({day,kid:'c',sh,sm,eh,em,label}); }
+  else BLOCKS.push({day,kid,sh,sm,eh,em,label});
+}
+for (const d of DAYS) {
+  add(d,'g',7,0,7,30,'Wake up');
+  add(d,'g',7,30,8,0,'Piano practice');
+  add(d,'g',8,0,8,30,'Breakfast');
+  if (d === 'Wednesday') add(d,'c',7,30,8,0,'Wake / morning');
+  else add(d,'c',7,0,8,0,'Wake / morning');
+  add(d,'c',8,0,8,30,'Breakfast');
+}
+add('Monday','b',10,0,11,0,'Badminton');
+add('Monday','g',14,0,15,0,'Piano lesson');
+add('Monday','b',18,15,19,15,'BJJ');
+add('Tuesday','b',8,30,15,45,'Airdrie Christian Academy');
+add('Tuesday','b',17,30,18,30,'BJJ');
+add('Tuesday','c',18,30,19,45,'Drums lesson');
+add('Wednesday','g',8,30,9,45,'WR (read, annotate, summarize)');
+add('Wednesday','g',9,45,11,0,'Math');
+add('Wednesday','g',11,0,12,0,'WOL + Spelling');
+add('Wednesday','g',12,0,12,30,'Lunch');
+add('Wednesday','g',12,30,13,0,'Piano (free play)');
+add('Wednesday','g',13,0,13,45,'Science (M13)');
+add('Wednesday','g',13,45,15,0,'Year-end project');
+add('Wednesday','g',15,0,15,45,'Literature (read)');
+add('Wednesday','c',8,30,10,0,'Math');
+add('Wednesday','c',10,0,11,15,'WR');
+add('Wednesday','c',11,15,12,0,'Latin (Ch 26)');
+add('Wednesday','c',12,0,12,30,'Lunch');
+add('Wednesday','c',12,30,13,0,'Recess');
+add('Wednesday','c',13,0,13,45,'Spelling + WOL');
+add('Wednesday','c',13,45,14,15,'Chinese');
+add('Wednesday','c',14,15,15,0,'Year-end project');
+add('Wednesday','c',15,0,15,45,'Literature (read)');
+add('Wednesday','b',18,15,19,15,'BJJ');
+add('Thursday','g',8,30,9,45,'WR (read, annotate, summarize)');
+add('Thursday','g',9,45,11,0,'Math');
+add('Thursday','g',11,0,11,30,'WOL');
+add('Thursday','g',11,30,11,45,'Recess');
+add('Thursday','g',11,45,12,30,'WOL + Spelling');
+add('Thursday','g',12,30,13,0,'Lunch');
+add('Thursday','g',13,0,13,45,'Science (M13)');
+add('Thursday','g',13,45,14,0,'Piano (free play)');
+add('Thursday','g',14,0,15,0,'Literature');
+add('Thursday','g',15,0,15,30,'Year-end project');
+add('Thursday','c',8,30,9,45,'Math');
+add('Thursday','c',9,45,10,15,'Drums practice');
+add('Thursday','c',10,15,11,30,'WR (King Arthur Chreia)');
+add('Thursday','c',11,30,11,45,'Recess');
+add('Thursday','c',11,45,12,30,'Spelling + WOL');
+add('Thursday','c',12,30,13,0,'Lunch');
+add('Thursday','c',13,0,13,45,'Chinese');
+add('Thursday','c',13,45,14,45,'Literature');
+add('Thursday','c',14,45,15,30,'Year-end project');
+add('Friday','g',8,30,9,45,'WR (draft)');
+add('Friday','g',9,45,11,0,'Math (draft)');
+add('Friday','g',11,0,11,45,'WOL + Spelling (draft)');
+add('Friday','g',11,45,12,0,'Recess (draft)');
+add('Friday','g',12,0,12,30,'Lunch (draft)');
+add('Friday','g',12,30,13,15,'Science (draft)');
+add('Friday','g',13,15,14,30,'Literature (draft)');
+add('Friday','g',14,30,15,30,'Year-end project (draft)');
+add('Friday','c',8,30,9,45,'Math (draft)');
+add('Friday','c',9,45,10,15,'Drums practice (draft)');
+add('Friday','c',10,15,11,30,'WR (draft)');
+add('Friday','c',11,30,11,45,'Recess (draft)');
+add('Friday','c',11,45,12,30,'Spelling + WOL (draft)');
+add('Friday','c',12,30,13,0,'Lunch (draft)');
+add('Friday','c',13,0,13,30,'Chinese (draft)');
+add('Friday','c',13,30,14,0,'Latin (draft)');
+add('Friday','c',14,0,15,0,'Literature (draft)');
+add('Friday','c',15,0,15,30,'Year-end project (draft)');
+add('Friday','b',17,0,18,0,'Badminton');
+add('Saturday','b',11,45,12,45,'BJJ');
+add('Saturday','b',13,0,14,30,'Tsunami swim');
+add('Sunday','b',9,0,12,0,'Church');
+
+function fmt(h,m) { const p = h<12?'AM':'PM'; const h12 = h>12?h-12:(h===0?12:h); return `${h12}:${String(m).padStart(2,'0')} ${p}`; }
+BLOCKS.forEach(b => { b.timeStr = `${fmt(b.sh,b.sm)} - ${fmt(b.eh,b.em)}`; b.startMin = b.sh*60+b.sm; b.endMin = b.eh*60+b.em; b.id = `${b.day}|${b.kid}|${b.sh}:${b.sm}|${b.label}`; });
+
+const WORK_G = [
+  ['Math', ['Lesson 77','Lesson 78','Lesson 79','Lesson 80','Investigation 8']],
+  ['Science', ['M13, W29, D3','M13, W29, D4','M13, W30, D1','M13, W30, D2','M13, W30, D3','M13, W30, D4','M13, W31, D1','M13, W31, D2']],
+  ['Spelling', ['Day 1','Day 2 (if needed)','Day 3 (if needed)','Day 4']],
+  ['Writing and Rhetoric (book 6)', [
+    'Annotate Real Politeness (pg 183-185)',
+    'Annotate Etiquette for the Ballroom - For Gentleman (pg. 185-186)',
+    'Annotate Table Etiquette - For the Ladies (pg. 186-187)',
+    'Annotate Contrasting Material - The Dance at Meryton (pg. 188)',
+    'Write a summary for Real Politeness',
+    'Write a summary for Table Etiquette (refer to pp. 208-210 for summary guidelines)',
+  ]],
+  ['WOL 4B (Chapter 7)', ['Compose Sentences Worksheet']],
+  ['Logic', null],
+  ['Literature', ['Read Pride and Prejudice (up to pg. 63)','Discussion questions']],
+  ['Year End Project', ['Annotate Birch Tree Research','Annotate Haudenesaunee Research','Written component (due May 5)']],
+];
+
+const WORK_C = [
+  ['Science', null],
+  ['Spelling', ['Day 1','Day 2 (if needed)','Day 3 (if needed)','Day 4']],
+  ['Writing and Rhetoric (book 4)', [
+    'Pg. 79-86',
+    { title: 'King Alfred Chreia', sub: [
+      'April 21: Paragraphs 1-3',
+      'April 28: Paragraphs 4-6',
+      'May 5: Good copy (due May 12)',
+    ]},
+  ]],
+  ['WOL 2B (Chapter 7)', ['Lessons to Learn A','Lessons to Learn B','Lessons to Learn C','Sentence for Practice']],
+  ['Latin', ['Chapter 26']],
+  ['Literature (The Moffats)', ['Read chapters 1-4','Discussion questions']],
+  ['Math', ['Test 17','Lesson 91','Lesson 92','Lesson 93','Lesson 94','Lesson 95']],
+  ['Year End Project', ['Written Component (due May 5)']],
+];
+
+const WORK_SHARED = [
+  ['History', ['Read HoC Vol 1 (ALL)','Banished from our Home','A Country of Our Own (pg. 1-34)']],
+  ['Physical Education', ['Next Activity log due June 2']],
+  ['ACE Family Showcase Project', ['Written Component due May 5','Presentation May 26']],
+];
+
+const GINNY_WEEK = {
+  Wednesday: [
+    ['Math','0','Lesson 77'],
+    ['Math','1','Lesson 78'],
+    ['Science','0','M13, W29, D3'],
+    ['Science','1','M13, W29, D4'],
+    ['Writing and Rhetoric (book 6)','0','Annotate Real Politeness'],
+    ['Writing and Rhetoric (book 6)','1','Annotate Etiquette for the Ballroom'],
+    ['WOL 4B (Chapter 7)','0','Compose Sentences Worksheet'],
+    ['Spelling','0','Day 1'],
+    ['Year End Project','0','Annotate Birch Tree Research'],
+  ],
+  Thursday: [
+    ['Math','2','Lesson 79'],
+    ['Math','3','Lesson 80'],
+    ['Science','2','M13, W30, D1'],
+    ['Science','3','M13, W30, D2'],
+    ['Science','4','M13, W30, D3'],
+    ['Writing and Rhetoric (book 6)','2','Annotate Table Etiquette'],
+    ['Writing and Rhetoric (book 6)','3','Annotate Contrasting Material'],
+    ['Spelling','1','Day 2 (if needed)'],
+    ['Year End Project','1','Annotate Haudenesaunee Research'],
+  ],
+  Friday: [
+    ['Math','4','Investigation 8'],
+    ['Science','5','M13, W30, D4'],
+    ['Science','6','M13, W31, D1'],
+    ['Writing and Rhetoric (book 6)','4','Summary: Real Politeness'],
+    ['Writing and Rhetoric (book 6)','5','Summary: Table Etiquette'],
+    ['Literature','0','Read Pride and Prejudice (up to pg. 63)'],
+    ['Spelling','2','Day 3 (if needed)'],
+  ],
+  Monday: [
+    ['Science','7','M13, W31, D2'],
+    ['Literature','1','Discussion questions'],
+    ['Spelling','3','Day 4'],
+    ['Year End Project','2','Written component (due May 5)'],
+  ],
+};
+
+const CASEY_WEEK = {
+  Wednesday: [
+    ['Spelling','0','Day 1'],
+    ['Writing and Rhetoric (book 4)','0','Pg. 79-86'],
+    ['WOL 2B (Chapter 7)','0','Lessons to Learn A'],
+    ['WOL 2B (Chapter 7)','1','Lessons to Learn B'],
+    ['Math','0','Test 17'],
+    ['Math','1','Lesson 91'],
+    ['Latin','0','Chapter 26'],
+  ],
+  Thursday: [
+    ['Spelling','1','Day 2 (if needed)'],
+    ['Writing and Rhetoric (book 4)','1.0','King Alfred Chreia - April 21 (Paragraphs 1-3)'],
+    ['WOL 2B (Chapter 7)','2','Lessons to Learn C'],
+    ['Math','2','Lesson 92'],
+    ['Math','3','Lesson 93'],
+    ['Literature (The Moffats)','0','Read chapters 1-4'],
+  ],
+  Friday: [
+    ['Spelling','2','Day 3 (if needed)'],
+    ['Writing and Rhetoric (book 4)','1.1','King Alfred Chreia - April 28 (Paragraphs 4-6)'],
+    ['WOL 2B (Chapter 7)','3','Sentence for Practice'],
+    ['Math','4','Lesson 94'],
+    ['Year End Project','0','Written Component (due May 5)'],
+  ],
+  Monday: [
+    ['Spelling','3','Day 4'],
+    ['Math','5','Lesson 95'],
+    ['Literature (The Moffats)','1','Discussion questions'],
+    ['Writing and Rhetoric (book 4)','1.2','King Alfred Chreia - May 5 good copy'],
+  ],
+};
+
+const LS_KEY = 'homeschool-schedule-v1';
+let state = { checks: {} };
+try { const raw = localStorage.getItem(LS_KEY); if (raw) state = JSON.parse(raw); } catch(e) {}
+function saveState() { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e) {} }
+
+const now = new Date();
+const jsDow = now.getDay();
+const todayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][jsDow];
+const nowMin = now.getHours()*60 + now.getMinutes();
+let selectedDay = todayName;
+
+function getWeekStartDate() {
+  const d = new Date(now);
+  const offset = (jsDow - WEEK_START_JS_DAY + 7) % 7;
+  d.setDate(d.getDate() - offset);
+  d.setHours(0,0,0,0);
+  return d;
+}
+const WEEK_START_DATE = getWeekStartDate();
+
+function dateForDay(dayName) {
+  const idx = WEEK_ORDER.indexOf(dayName);
+  const d = new Date(WEEK_START_DATE);
+  d.setDate(d.getDate() + idx);
+  return d;
+}
+
+const hints = {
+  Monday: 'No school today. Badminton 10-11, Piano lesson 2-3 (Ginny), BJJ 6:15-7:15.',
+  Tuesday: 'Academy day. BJJ 5:30-6:30, Drums lesson 6:40-7:40 (Casey).',
+  Wednesday: 'Home school day. BJJ 6:15-7:15.',
+  Thursday: 'Home school day.',
+  Friday: 'Draft home school schedule. Badminton 5-6.',
+  Saturday: 'No school. BJJ 11:45 and swim 1-2:30.',
+  Sunday: 'Church 9-12. No school.',
+};
+
+function renderDaySelector() {
+  const sel = document.getElementById('day-selector');
+  sel.innerHTML = WEEK_ORDER.map((d,i) => {
+    const classes = ['day-btn'];
+    if (d === selectedDay) classes.push('active');
+    if (d === todayName) classes.push('today');
+    return `<button data-day="${d}" class="${classes.join(' ')}">${WEEK_ORDER_SHORT[i]}</button>`;
+  }).join('');
+}
+
+function renderKidDay(kidCode, dayName, containerId) {
+  const container = document.getElementById(containerId);
+  const blocks = BLOCKS.filter(b => b.day === dayName && b.kid === kidCode).sort((a,b)=>a.startMin-b.startMin);
+  if (blocks.length === 0) { container.innerHTML = '<div class="empty">Nothing scheduled</div>'; return; }
+  const isToday = dayName === todayName;
+  container.innerHTML = blocks.map(b => {
+    const isPast = isToday && b.endMin <= nowMin;
+    const isNow = isToday && b.startMin <= nowMin && nowMin < b.endMin;
+    const checked = state.checks[b.id] ? 'checked' : '';
+    return `<label class="block cat-${cat(b.label)} ${isNow?'now':''} ${isPast?'past':''}"><input type="checkbox" data-id="${b.id}" ${checked}><span class="time">${b.timeStr}</span><span class="lbl">${b.label}</span></label>`;
+  }).join('');
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderDayChecklist(kidCode, dayName, workMap, containerId, countId) {
+  const container = document.getElementById(containerId);
+  const items = workMap[dayName] || [];
+  const countEl = document.getElementById(countId);
+  if (items.length === 0) {
+    container.innerHTML = '<div class="empty">No assignments this day</div>';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+  let done = 0;
+  const html = items.map(([subj, path, label]) => {
+    const k = `assign|${kidCode}|${subj}|${path}`;
+    const isChecked = !!state.checks[k];
+    if (isChecked) done++;
+    return `<li class="${isChecked?'done':''}"><input type="checkbox" data-id="${k}" ${isChecked?'checked':''}><label><span class="subj-badge">${escapeHTML(subj.replace(/ \(.*?\)$/,''))}</span>${escapeHTML(label)}</label></li>`;
+  }).join('');
+  container.innerHTML = `<ul class="day-checklist">${html}</ul>`;
+  if (countEl) countEl.textContent = `(${done}/${items.length})`;
+}
+
+function renderItem(kidCode, subj, path, item) {
+  if (typeof item === 'string') {
+    const k = `assign|${kidCode}|${subj}|${path}`;
+    const checked = state.checks[k] ? 'checked' : '';
+    const done = state.checks[k] ? 'done' : '';
+    return `<li class="${done}"><label><input type="checkbox" data-id="${k}" ${checked}>${escapeHTML(item)}</label></li>`;
+  }
+  const subHtml = item.sub.map((s,i) => renderItem(kidCode, subj, `${path}.${i}`, s)).join('');
+  return `<li><span class="group-title">${escapeHTML(item.title)}</span><ul>${subHtml}</ul></li>`;
+}
+
+function assignCardHTML(workArr, kidCode, kidName) {
+  let html = `<h3>${escapeHTML(kidName)}</h3>`;
+  workArr.forEach(([subj, items]) => {
+    if (items === null) {
+      html += `<div class="subj">${escapeHTML(subj)}<span class="na">— N/A this week</span></div>`;
+      return;
+    }
+    html += `<div class="subj">${escapeHTML(subj)}</div><ul>`;
+    items.forEach((it, idx) => {
+      html += renderItem(kidCode, subj, String(idx), it);
+    });
+    html += '</ul>';
+  });
+  return html;
+}
+
+function renderDayView() {
+  const d = dateForDay(selectedDay);
+  document.getElementById('today-date').textContent = d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) + (selectedDay === todayName ? ' — Today' : '');
+  document.getElementById('today-hint').textContent = hints[selectedDay] || '';
+  renderKidDay('g', selectedDay, 'today-ginny');
+  renderKidDay('c', selectedDay, 'today-casey');
+  renderDayChecklist('gA', selectedDay, GINNY_WEEK, 'today-ginny-checklist', 'ginny-count');
+  renderDayChecklist('cA', selectedDay, CASEY_WEEK, 'today-casey-checklist', 'casey-count');
+  document.querySelectorAll('#day-selector button').forEach(b => b.classList.toggle('active', b.dataset.day === selectedDay));
+}
+
+function renderAssignments() {
+  document.getElementById('assign-ginny').innerHTML = assignCardHTML(WORK_G, 'gA', 'Ginny');
+  document.getElementById('assign-casey').innerHTML = assignCardHTML(WORK_C, 'cA', 'Casey');
+  document.getElementById('assign-shared').innerHTML = assignCardHTML(WORK_SHARED, 'sA', 'Both');
+}
+
+document.addEventListener('change', e => {
+  if (e.target.matches('input[type=checkbox][data-id]')) {
+    const id = e.target.dataset.id;
+    state.checks[id] = e.target.checked;
+    saveState();
+    document.querySelectorAll(`input[data-id="${CSS.escape(id)}"]`).forEach(cb => {
+      cb.checked = e.target.checked;
+      const li = cb.closest('li');
+      if (li) li.classList.toggle('done', e.target.checked);
+    });
+    const ginnyItems = GINNY_WEEK[selectedDay] || [];
+    const ginnyDone = ginnyItems.filter(([s,p]) => state.checks[`assign|gA|${s}|${p}`]).length;
+    const gc = document.getElementById('ginny-count');
+    if (gc && ginnyItems.length) gc.textContent = `(${ginnyDone}/${ginnyItems.length})`;
+    const caseyItems = CASEY_WEEK[selectedDay] || [];
+    const caseyDone = caseyItems.filter(([s,p]) => state.checks[`assign|cA|${s}|${p}`]).length;
+    const cc = document.getElementById('casey-count');
+    if (cc && caseyItems.length) cc.textContent = `(${caseyDone}/${caseyItems.length})`;
+  }
+});
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('panel-' + t.dataset.tab).classList.add('active');
+}));
+
+document.getElementById('day-selector').addEventListener('click', e => {
+  if (e.target.matches('button[data-day]')) {
+    selectedDay = e.target.dataset.day;
+    renderDayView();
+  }
+});
+
+document.querySelectorAll('[data-reset]').forEach(btn => btn.addEventListener('click', e => {
+  e.preventDefault();
+  const kidCode = btn.dataset.reset === 'ginny' ? 'g' : 'c';
+  const kidAssignCode = kidCode === 'g' ? 'gA' : 'cA';
+  const workMap = kidCode === 'g' ? GINNY_WEEK : CASEY_WEEK;
+  BLOCKS.filter(b => b.kid === kidCode && b.day === selectedDay).forEach(b => { delete state.checks[b.id]; });
+  (workMap[selectedDay] || []).forEach(([s, p]) => { delete state.checks[`assign|${kidAssignCode}|${s}|${p}`]; });
+  saveState();
+  renderDayView();
+  renderAssignments();
+}));
+
+renderDaySelector();
+renderDayView();
+renderAssignments();
+</script>
+</body>
+</html>
